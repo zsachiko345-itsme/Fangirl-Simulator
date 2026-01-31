@@ -5,6 +5,7 @@ import StatusHeader from './components/StatusHeader';
 import GameLog from './components/GameLog';
 import ActionMenu from './components/ActionMenu';
 import { AchievementModal } from './components/AchievementDisplay';
+import SettingsModal from './components/SettingsModal';
 
 const FANDOMS = [
   { name: '欧美冷门剧', mode: 'General' }, 
@@ -178,6 +179,7 @@ export default function App() {
   const [view, setView] = useState<'start' | 'game'>('start');
   const [activeMenu, setActiveMenu] = useState<ActionCategory | null>(null);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   
   const [state, setState] = useState<GameState>({
@@ -502,7 +504,7 @@ export default function App() {
         <StatusHeader 
           state={state} 
           showAchievements={() => setShowAchievements(true)}
-          onReset={() => setView('start')}
+          onOpenSettings={() => setShowSettings(true)}
         />
 
         <GameLog logs={logs} />
@@ -520,6 +522,16 @@ export default function App() {
           <AchievementModal 
             unlockedIds={state.unlockedAchievements} 
             onClose={() => setShowAchievements(false)} 
+          />
+        )}
+        
+        {showSettings && (
+          <SettingsModal 
+            onClose={() => setShowSettings(false)}
+            onReset={() => {
+              setView('start');
+              setShowSettings(false);
+            }}
           />
         )}
 

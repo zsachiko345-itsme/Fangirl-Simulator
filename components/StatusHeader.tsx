@@ -5,16 +5,10 @@ import { AchievementBadges } from './AchievementDisplay';
 interface Props {
   state: GameState;
   showAchievements: () => void;
-  onReset: () => void;
+  onOpenSettings: () => void;
 }
 
-const StatusHeader: React.FC<Props> = ({ state, showAchievements, onReset }) => {
-  const handleResetClick = () => {
-    if (window.confirm('确定要重置游戏回到主菜单吗？\nAre you sure you want to reset the game?')) {
-      onReset();
-    }
-  };
-
+const StatusHeader: React.FC<Props> = ({ state, showAchievements, onOpenSettings }) => {
   return (
     <div className="bg-[#F0F0F0] p-3 border-b border-gray-300 shadow-sm sticky top-0 z-10">
       <div className="flex justify-between items-center mb-2">
@@ -38,8 +32,8 @@ const StatusHeader: React.FC<Props> = ({ state, showAchievements, onReset }) => 
           </div>
         </div>
         <div className="flex gap-2">
-           <button onClick={handleResetClick} className="text-lg p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-[#990000]" title="Reset Game">
-            ↺
+           <button onClick={onOpenSettings} className="text-lg p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-black" title="Settings">
+            ⚙️
           </button>
           <button onClick={showAchievements} className="text-xl p-1 hover:bg-gray-200 rounded" title="Achievements">
             🏆
