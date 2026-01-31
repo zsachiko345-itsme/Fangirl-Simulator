@@ -12,6 +12,24 @@ export interface Achievement {
   tier: number; // 1, 2, 3, 4 for sorting/replacing
 }
 
+export interface RandomEvent {
+  id: string;
+  name: string;
+  description: string;
+  effectDesc: string;
+  logic: {
+    san?: number;
+    money?: number;
+    heat?: number;
+    toxic?: number;
+    apZero?: boolean;
+    buff?: string;
+    buffDuration?: number;
+    triggerFlag?: string;
+    skipTurn?: boolean;
+  }
+}
+
 export interface GameState {
   playerName: string;
   job: JobType;
@@ -44,6 +62,10 @@ export interface GameState {
   isGameOver: boolean;
   unlockedAchievements: string[]; // List of Achievement IDs
   forceHighNext: boolean; // For ACH_13
+  
+  // Event Flags
+  shadowBanWeeks: number;
+  scandalActive: boolean;
 }
 
 export interface LogEntry {

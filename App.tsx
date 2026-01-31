@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { GameState, LogEntry, ActionCategory, ActionDefinition, LuckLevel, JobType } from './types';
-import { JOB_MAP, ACTIONS, FLAVOR_TEXT, ACHIEVEMENTS } from './data';
+import { GameState, LogEntry, ActionCategory, ActionDefinition, LuckLevel, JobType, RandomEvent } from './types';
+import { JOB_MAP, ACTIONS, FLAVOR_TEXT, ACHIEVEMENTS, RANDOM_EVENTS } from './data';
 import StatusHeader from './components/StatusHeader';
 import GameLog from './components/GameLog';
 import ActionMenu from './components/ActionMenu';
 import { AchievementModal } from './components/AchievementDisplay';
 import SettingsModal from './components/SettingsModal';
+import SettlementScreen from './components/SettlementScreen';
+import EventModal from './components/EventModal';
 
 const FANDOMS = [
   { name: '欧美冷门剧', mode: 'General' }, 
@@ -149,35 +151,10 @@ const StartScreen: React.FC<{ onStart: (profile: CharacterProfile) => void }> = 
   );
 };
 
-// Result Screen
-const GameOverScreen: React.FC<{ state: GameState, onRestart: () => void }> = ({ state, onRestart }) => (
-  <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-8 text-white text-center animate-fadeIn">
-    <h2 className="text-6xl font-black text-[#990000] mb-2 italic">END</h2>
-    <p className="text-xl mb-12 font-serif text-gray-300 italic">
-      {state.san <= 0 ? "你发疯退网了 (SAN归零)" : "你破产回归三次元了 (存款透支)"}
-    </p>
-    <div className="grid grid-cols-2 gap-4 w-full mb-12 max-w-sm">
-      <div className="bg-white/10 p-4 border border-white/20">
-        <div className="text-xs text-gray-400 uppercase">Total Fans</div>
-        <div className="text-2xl font-bold">{state.fans.toLocaleString()}</div>
-      </div>
-      <div className="bg-white/10 p-4 border border-white/20">
-        <div className="text-xs text-gray-400 uppercase">Weeks Survived</div>
-        <div className="text-2xl font-bold">{state.weeks}</div>
-      </div>
-    </div>
-    <button 
-      className="w-full max-w-xs py-4 bg-[#990000] text-white font-black uppercase tracking-widest hover:bg-red-700 transition-colors"
-      onClick={onRestart}
-    >
-      Restart Game
-    </button>
-  </div>
-);
-
 export default function App() {
   const [view, setView] = useState<'start' | 'game'>('start');
   const [activeMenu, setActiveMenu] = useState<ActionCategory | null>(null);
+  const [activeEvent, setActiveEvent] = useState<RandomEvent | null>(null);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -187,7 +164,8 @@ export default function App() {
     weeks: 1, san: 100, maxSan: 100, money: 5000, heat: 0, fans: 0, 
     ap: 5, maxAp: 5, moe: 0, toxic: 0, worksCount: 0,
     maxSingleHeat: 0, consecutiveNoProduce: 0, consecutiveLow: 0, hasRevived: false,
-    isGameOver: false, unlockedAchievements: [], forceHighNext: false
+    isGameOver: false, unlockedAchievements: [], forceHighNext: false,
+    shadowBanWeeks: 0, scandalActive: false
   });
 
   // Helper to unlock achievements
@@ -251,7 +229,8 @@ export default function App() {
       ap: 5, maxAp: 5,
       moe: 0, toxic: 0, worksCount: 0,
       maxSingleHeat: 0, consecutiveNoProduce: 0, consecutiveLow: 0, hasRevived: false,
-      isGameOver: false, unlockedAchievements: [], forceHighNext: false
+      isGameOver: false, unlockedAchievements: [], forceHighNext: false,
+      shadowBanWeeks: 0, scandalActive: false
     });
     setLogs([]);
     addLog(`欢迎来到同人圈。你的身份是 <b>${profile.job.toUpperCase()}</b>.`, 'system');
@@ -260,7 +239,46 @@ export default function App() {
     setView('game');
   };
 
+  const handleEventConfirm = () => {
+    if (!activeEvent) return;
+    
+    setState(prev => {
+        let next = { ...prev };
+        const logic = activeEvent.logic;
+
+        if (logic.san) next.san = Math.max(0, next.san + logic.san);
+        if (logic.money) next.money += logic.money;
+        if (logic.heat) next.heat += logic.heat;
+        if (logic.toxic) next.toxic += logic.toxic;
+        
+        if (logic.apZero) next.ap = 0;
+        if (logic.buff === 'shadow_ban') next.shadowBanWeeks = logic.buffDuration || 2;
+        if (logic.triggerFlag === 'scandal_active') next.scandalActive = true;
+        // Note: skipTurn logic is handled implicitly by consuming AP or user just not having actions. 
+        // We set AP to 0 for skipTurn to be safe if not explicit.
+        if (logic.skipTurn) next.ap = 0;
+
+        // Check Game Over immediately after event
+        if (next.san <= 0) {
+            if (!next.hasRevived && next.unlockedAchievements.includes('ACH_12')) {
+                next.san = 20;
+                next.hasRevived = true;
+                addLog('💔 SAN值归零... 但是！【强心脏】发动！垂死病中惊坐起！', 'success');
+            } else {
+                next.isGameOver = true;
+            }
+        }
+        if (next.money < 0) next.isGameOver = true;
+
+        return next;
+    });
+
+    addLog(`⚠️ <b>事件生效:</b> ${activeEvent.name}`, 'danger');
+    setActiveEvent(null);
+  };
+
   const handleNextWeek = () => {
+    // 1. Regular Update
     setState(prev => {
       let nextState = { ...prev };
       
@@ -280,12 +298,13 @@ export default function App() {
       nextState.ap = prev.maxAp + maxApBuff;
       
       // Track no produce
-      // We rely on consecutiveNoProduce being incremented here, 
-      // and reset in handleAction if Produce.
       nextState.consecutiveNoProduce += 1;
+      
+      // Decrement Shadow Ban
+      if (nextState.shadowBanWeeks > 0) nextState.shadowBanWeeks -= 1;
 
       // Check Game Over
-      if (nextState.money < -1000) {
+      if (nextState.money < 0) {
         nextState.isGameOver = true;
       }
 
@@ -293,6 +312,14 @@ export default function App() {
       addLog(`--- 第 ${nextState.weeks} 周 ---`, 'system');
       if (isPayday) addLog(`💸 发工资了！+${salary}`, 'success');
       addLog(`支付生活费 ${livingCost}。`, 'system');
+      
+      if (nextState.scandalActive) {
+          // Scandal follow-up chance
+          if (Math.random() < 0.3) {
+              addLog(`☠️ 塌房余波：你被极端粉冲了，SAN -10`, 'danger');
+              nextState.san -= 10;
+          }
+      }
 
       // Check achievements after weekly update
       nextState = checkAchievements(nextState);
@@ -300,6 +327,13 @@ export default function App() {
       return nextState;
     });
     setActiveMenu(null);
+    
+    // 2. Trigger Event Check
+    const threshold = state.san < 20 ? 0.4 : 0.2;
+    if (Math.random() < threshold) {
+        const evt = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
+        setTimeout(() => setActiveEvent(evt), 200);
+    }
   };
 
   const handleAction = (act: ActionDefinition) => {
@@ -352,35 +386,41 @@ export default function App() {
     // HEAT CALCULATION (New Formula)
     let heatGain = 0;
     if (activeMenu === 'PRODUCE') {
-      // Base: Lv1=50, Lv2=200, Lv3=800
-      let base = 50;
-      if (act.id === 'lv2') base = 200;
-      if (act.id === 'lv3') base = 800;
+      // Check Shadow Ban
+      if (state.shadowBanWeeks > 0) {
+        heatGain = 0;
+        logText += " (但是被限流了，热度 +0)";
+      } else {
+        // Base: Lv1=50, Lv2=200, Lv3=800
+        let base = 50;
+        if (act.id === 'lv2') base = 200;
+        if (act.id === 'lv3') base = 800;
 
-      // Random (0.8 - 1.2 variance)
-      const variance = 0.8 + Math.random() * 0.4;
-      
-      // Fan Multiplier (Snowball)
-      const fanMult = 1 + (state.heat / 5000);
-      
-      // Crit
-      let crit = 1.0;
-      if (luck === 'high') crit = 1.5;
-      if (luck === 'low') crit = 0.5;
-      
-      heatGain = Math.floor((base * variance) * fanMult * crit);
+        // Random (0.8 - 1.2 variance)
+        const variance = 0.8 + Math.random() * 0.4;
+        
+        // Fan Multiplier (Snowball)
+        const fanMult = 1 + (state.heat / 5000);
+        
+        // Crit
+        let crit = 1.0;
+        if (luck === 'high') crit = 1.5;
+        if (luck === 'low') crit = 0.5;
+        
+        heatGain = Math.floor((base * variance) * fanMult * crit);
 
-      // ACH_01: Newbie protection
-      if (state.unlockedAchievements.includes('ACH_01') && state.heat < 1000) {
-        heatGain = Math.floor(heatGain * 1.1);
-      }
-      // ACH_03: Goddess Base +50% (Applied to final for simplicity)
-      if (state.unlockedAchievements.includes('ACH_03')) {
-        heatGain = Math.floor(heatGain * 1.5);
-      }
-      // ACH_04: God x2
-      if (state.unlockedAchievements.includes('ACH_04')) {
-        heatGain = heatGain * 2;
+        // ACH_01: Newbie protection
+        if (state.unlockedAchievements.includes('ACH_01') && state.heat < 1000) {
+          heatGain = Math.floor(heatGain * 1.1);
+        }
+        // ACH_03: Goddess Base +50% (Applied to final for simplicity)
+        if (state.unlockedAchievements.includes('ACH_03')) {
+          heatGain = Math.floor(heatGain * 1.5);
+        }
+        // ACH_04: God x2
+        if (state.unlockedAchievements.includes('ACH_04')) {
+          heatGain = heatGain * 2;
+        }
       }
     } else {
       // Social/Life heat (legacy small amounts)
@@ -451,7 +491,7 @@ export default function App() {
           newState.isGameOver = true;
         }
       }
-      if (newState.money < -2000) {
+      if (newState.money < 0) {
         newState.isGameOver = true;
       }
 
@@ -535,8 +575,17 @@ export default function App() {
           />
         )}
 
+        {/* Event Modal */}
+        {activeEvent && (
+            <EventModal 
+                event={activeEvent}
+                onConfirm={handleEventConfirm}
+            />
+        )}
+
+        {/* Settlement Screen */}
         {state.isGameOver && (
-          <GameOverScreen state={state} onRestart={() => setView('start')} />
+          <SettlementScreen state={state} onRestart={() => setView('start')} />
         )}
       </div>
     </div>

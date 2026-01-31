@@ -1,4 +1,4 @@
-import { ActionDefinition, FlavorTextData, JobType, Achievement } from './types';
+import { ActionDefinition, FlavorTextData, JobType, Achievement, RandomEvent } from './types';
 
 export const JOB_MAP: Record<string, JobType> = { 
   '文手': 'writer', 
@@ -29,6 +29,44 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'ACH_12', category: 'D', tier: 1, name: '强心脏', conditionDesc: 'San值曾=1 但没死', description: '如果你死不了，就会变得更强。', rewardDesc: 'San值归零的容错率增加 (复活甲)' },
   { id: 'ACH_13', category: 'D', tier: 2, name: '非酋之王', conditionDesc: '连续 3 次产出失败/Low', description: '有些人的运气是玄学，而你的是科学。', rewardDesc: '下一次必定触发 High 事件' },
   { id: 'ACH_14', category: 'D', tier: 3, name: '爬墙专业户', conditionDesc: '触发“爬墙”结局', description: '拜拜就拜拜，下一个更乖。', rewardDesc: '(这是结局成就，无Buff)' },
+];
+
+export const RANDOM_EVENTS: RandomEvent[] = [
+    {
+        id: 'EVT_SERVER_DOWN',
+        name: '快乐老家炸了',
+        description: '突发！Lofter/AO3 服务器被不明力量击中（崩了）。你的“快乐老家”炸了，全网同人女戒断反应发作，哀鸿遍野。',
+        effectDesc: 'San -20 (焦虑) | 本周强制跳过',
+        logic: { san: -20, skipTurn: true }
+    },
+    {
+        id: 'EVT_BACKSTAB',
+        name: '官方吃书背刺',
+        description: '官方突然吃书改设定！你搞了三年的 CP 居然被官方盖章是“失散多年的亲兄妹/仇人”。你的粮仓塌了一半，小丑竟是我自己。',
+        effectDesc: 'San -30 (心梗) | Toxic +15 (因爱生恨)',
+        logic: { san: -30, toxic: 15 }
+    },
+    {
+        id: 'EVT_REALITY',
+        name: '三次元的铁拳',
+        description: '现充生活给了你一记重拳（突然被抓去相亲/老板夺命连环Call）。你被迫暂时放下“赛博女明星”的身份，去修补摇摇欲坠的现实生活。',
+        effectDesc: 'AP 清零 (无法行动) | Money +200 (窝囊费)',
+        logic: { apZero: true, money: 200 }
+    },
+    {
+        id: 'EVT_SCANDAL',
+        name: '正主踩缝纫机',
+        description: '惊天大瓜！你搞的纸片人/皮套人/正主居然法制咖了/塌房了！超话连夜解散，你的主页变成了大型赛博灵堂。',
+        effectDesc: 'San -50 (崩塌) | 热度 -5000 (脱粉) | ⚠️ 警告：下周大概率退网',
+        logic: { san: -50, heat: -5000, triggerFlag: 'scandal_active' }
+    },
+    {
+        id: 'EVT_SHADOWBAN',
+        name: '限流大礼包',
+        description: '不知道触发了什么关键词，你的账号被大眼仔/平台限流了。发出去的图只有你自己能看见，仿佛在这个互联网上裸奔。',
+        effectDesc: 'San -10 | 热度增长归零 (持续2周)',
+        logic: { san: -10, buff: 'shadow_ban', buffDuration: 2 }
+    }
 ];
 
 export const ACTIONS: Record<string, ActionDefinition[]> = {
@@ -64,7 +102,6 @@ export const ACTIONS: Record<string, ActionDefinition[]> = {
   ]
 };
 
-// Data transcribed from the provided logs
 export const FLAVOR_TEXT: Record<string, Record<string, FlavorTextData>> = {
   writer: {
     lv1: {
@@ -241,7 +278,7 @@ export const FLAVOR_TEXT: Record<string, Record<string, FlavorTextData>> = {
         "甚至发错表情包，发了个微笑（嘲讽脸）给太太，社死。",
         "你的评论被误判为垃圾广告折叠了，申诉无门。",
         "甚至被杠精回复了“就这？”，你气得手抖。"
-      ]
+      ],
     },
     lv2: {
       high: [
