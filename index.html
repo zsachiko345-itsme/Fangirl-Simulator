@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>同人女模拟器</title>
+    <title>同人女模拟器 v2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM (UMD) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -93,9 +93,9 @@
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.4/",
     "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
   }
 }
 </script>
@@ -107,7 +107,7 @@
         const { useState, useEffect, useCallback, useRef } = React;
 
         // ==========================================
-        // DATA SECTION
+        // DATA SECTION (ASSETS PRESERVED)
         // ==========================================
 
         const JOB_MAP = { 
@@ -122,17 +122,17 @@
             { id: 'ACH_01', category: 'A', tier: 1, name: '圈内小透明', conditionDesc: '热度 < 1,000 (首次产出后)', description: '你发出的声音只有回音。没关系，谁不是从零开始的呢？', rewardDesc: '产出热度 +10% (新手保护)' },
             { id: 'ACH_02', category: 'A', tier: 2, name: '紫微星降临', conditionDesc: '单次产出 > 5,000', description: '老天赏饭吃！一夜之间，你的通知栏炸了。', rewardDesc: '爆款率 (High事件) 提升至 40%' },
             { id: 'ACH_03', category: 'A', tier: 3, name: '女神 (KOL)', conditionDesc: '总热度 > 20,000', description: '你开始有腿毛了，甚至有人专门在你的评论区蹲点。', rewardDesc: '基础产出热度 +50%' },
-            { id: 'ACH_04', category: 'A', tier: 4, name: '镇圈神仙', conditionDesc: '总热度 > 100,000', description: '只要提起这对CP，你是绕不过去的高山。', rewardDesc: '所有热度收益翻倍 (x2)' },
+            { id: 'ACH_04', category: 'A', tier: 4, name: '镇圈神仙', conditionDesc: '总热度 > 100,000', description: '只要提起这对CP，你是绕不过去的高山。', rewardDesc: '所有热度收益翻倍 (x2) | 允许光荣退圈' },
 
             // B: 肝度与财富
             { id: 'ACH_05', category: 'B', tier: 1, name: '吃土少女', conditionDesc: '存款 < 500', description: '为了买谷，你甚至连泡面汤都要喝干净。', rewardDesc: '现充打工收益 +20% (穷则思变)' },
-            { id: 'ACH_06', category: 'B', tier: 2, name: '富婆', conditionDesc: '存款 > 50,000', description: '自带钞能力的同人女。你可以买下整个漫展的摊位。', rewardDesc: '氪金选项 (Level 2/3) 消耗 -20%' },
+            { id: 'ACH_06', category: 'B', tier: 2, name: '富婆', conditionDesc: '存款 > 50,000', description: '自带钞能力的同人女。你可以买下整个漫展的摊位。', rewardDesc: '氪金选项 (Level 2/3) 消耗 -20% | 允许光荣退圈' },
             { id: 'ACH_07', category: 'B', tier: 3, name: '肝帝', conditionDesc: '产出次数 > 50', description: '你的手速是人类的极限，生产队的驴都不敢这么歇。', rewardDesc: '每周 AP 上限 +1' },
             { id: 'ACH_08', category: 'B', tier: 4, name: '鸽子精', conditionDesc: '连续 4 周无产出', description: '咕咕咕。你的粉丝正在提刀赶来的路上。', rewardDesc: '摆烂快乐 (San值消耗减少)' },
 
             // C: 性格路线
             { id: 'ACH_09', category: 'C', tier: 1, name: '互联网菩萨', conditionDesc: 'Moe (萌) > 80', description: '你从不掐架，只产粮和夸夸。你是最后的净土。', rewardDesc: '互动回血效果 +50%' },
-            { id: 'ACH_10', category: 'C', tier: 2, name: '粉圈女明星', conditionDesc: 'Toxic (毒) > 80', description: '哪里有瓜，哪里就有你。你的战斗力让黑粉闻风丧胆。', rewardDesc: '挂人/吵架的热度收益 +50%' },
+            { id: 'ACH_10', category: 'C', tier: 2, name: '粉圈女明星', conditionDesc: 'Toxic (毒) > 80', description: '哪里有瓜，哪里就有你。你的战斗力让黑粉闻风丧胆。', rewardDesc: '挂人/吵架的热度收益 +50% | 商务报价提升' },
             { id: 'ACH_11', category: 'C', tier: 3, name: '端水大师', conditionDesc: '萌/毒皆<20 且存活2年(96周)', description: '你在枪林弹雨中毫发无伤，甚至还能岁月静好。', rewardDesc: 'San值上限 +20' },
 
             // D: 彩蛋
@@ -201,13 +201,13 @@
                 { id: 'lv3', label: '产粮(伪)', apCost: 3, baseSanChange: -5, baseMoneyChange: 0, baseHeat: 50, intent: '虽然我是路人，但我也要为CP发光发热！' }
             ],
             SOCIAL: [
-                { id: 'lv1', label: '积极社交', apCost: 1, baseSanChange: 5, baseMoneyChange: 0, intent: '懒得打字，只想用一串“啊啊啊啊”来表达对这个世界的敬意。' },
-                { id: 'lv2', label: '安利/扩列', apCost: 2, baseSanChange: 0, baseMoneyChange: 0, baseHeat: 100, intent: '只有找到组织，我的CP脑才不会在这个冷漠的世界里感到孤独。' },
-                { id: 'lv3', label: '战斗对线', apCost: 2, baseSanChange: -20, baseMoneyChange: 0, baseHeat: 500, intent: '谁敢拆我CP？谁敢嘴我担？键来！' }
+                { id: 'lv1', label: '积极社交', apCost: 1, baseSanChange: 10, baseMoneyChange: 0, intent: '懒得打字，只想用一串“啊啊啊啊”来表达对这个世界的敬意。' },
+                { id: 'lv2', label: '安利/扩列', apCost: 1, baseSanChange: 0, baseMoneyChange: 0, baseHeat: 100, intent: '只有找到组织，我的CP脑才不会在这个冷漠的世界里感到孤独。' },
+                { id: 'lv3', label: '战斗对线', apCost: 1, baseSanChange: -10, baseMoneyChange: 0, baseHeat: 500, intent: '谁敢拆我CP？谁敢嘴我担？键来！' }
             ],
             LIFE: [
                 { id: 'lv1', label: '睡大觉/躺平', apCost: 1, baseSanChange: 15, baseMoneyChange: 0, intent: '只要我睡得够快，生活的烦恼就追不上我。' },
-                { id: 'lv2', label: '搬砖打工', apCost: 2, baseSanChange: -10, baseMoneyChange: 800, intent: '为了买谷子，为了给爱发电，肉体在坐牢，灵魂搞同人。' },
+                { id: 'lv2', label: '搬砖打工', apCost: 1, baseSanChange: -5, baseMoneyChange: 800, intent: '为了买谷子，为了给爱发电，肉体在坐牢，灵魂搞同人。' },
                 { id: 'lv3', label: '现充聚会', apCost: 3, baseSanChange: 5, baseMoneyChange: -200, intent: '戴上名为“现充”的面具，小心不要把相册里的涩图露出来。' }
             ]
         };
@@ -623,7 +623,7 @@
                             </div>
                             
                             <div className="border-t border-gray-100 pt-4 text-center">
-                                <p className="text-[10px] text-gray-400">Fangirl Simulator Refactored<br/>v1.1.0 (Events)</p>
+                                <p className="text-[10px] text-gray-400">Fangirl Simulator v2.0<br/>Economy Update</p>
                             </div>
                         </div>
                     </div>
@@ -631,14 +631,12 @@
             );
         };
 
-        // NEW: Event Modal Component
         const EventModal = ({ event, onConfirm }) => {
             if (!event) return null;
 
             return (
                 <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-6 animate-fadeIn">
                     <div className="bg-white w-full max-w-sm border-4 border-[#990000] shadow-[10px_10px_0px_rgba(255,0,0,0.2)] animate-shake relative overflow-hidden">
-                         {/* Warning Stripe */}
                          <div className="bg-[repeating-linear-gradient(45deg,#FFEB3B,#FFEB3B_10px,#000_10px,#000_20px)] h-4 w-full border-b border-black"></div>
                          
                          <div className="p-6 text-center">
@@ -666,7 +664,10 @@
             );
         };
 
-        const StatusHeader = ({ state, showAchievements, onOpenSettings }) => {
+        const StatusHeader = ({ state, showAchievements, onOpenSettings, onRetire }) => {
+            // Module A: Check for Retirement Eligibility (God or Rich)
+            const canRetire = state.unlockedAchievements.includes('ACH_04') || state.unlockedAchievements.includes('ACH_06');
+
             return (
                 <div className="bg-[#F0F0F0] p-3 border-b border-gray-300 shadow-sm sticky top-0 z-10">
                     <div className="flex justify-between items-center mb-2">
@@ -688,7 +689,16 @@
                                 {state.fandom} • {state.trope}
                             </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
+                            {canRetire && (
+                                <button 
+                                    onClick={onRetire}
+                                    className="text-[10px] bg-yellow-400 text-yellow-900 px-2 py-1 rounded font-bold uppercase hover:bg-yellow-300 border border-yellow-500 animate-fadeIn"
+                                    title="Announce Retirement"
+                                >
+                                    光荣退圈
+                                </button>
+                            )}
                             <button onClick={onOpenSettings} className="text-lg p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-black" title="Settings">
                                 ⚙️
                             </button>
@@ -756,6 +766,27 @@
             );
         };
 
+        const getActionStats = (act, category) => {
+            const ap = `⚡-${act.apCost}`;
+            const moneyVal = act.baseMoneyChange;
+            const money = `💰${moneyVal > 0 ? '+' + moneyVal : moneyVal}`;
+            
+            let san = `🧠${act.baseSanChange > 0 ? '+' + act.baseSanChange : act.baseSanChange}`;
+            
+            if (category === 'SOCIAL') {
+                if (act.id === 'lv2') san = '📈热度Up';
+                if (act.id === 'lv3') san = '🔥ToxicUp';
+                if (act.id === 'lv2_rich') san = '🔥热度x2'; 
+            } else if (category === 'LIFE') {
+                if (act.id === 'lv1') san = '🧠++回血';
+                if (act.id === 'lv3_rich') san = '🧠MAX';
+                // Module C: Ad stats
+                if (act.id === 'take_ad') san = '💰恰饭'; 
+            } 
+            
+            return `(${ap} | ${money} | ${san})`;
+        };
+
         const ActionMenu = ({ 
             activeCategory, 
             actions, 
@@ -780,6 +811,15 @@
                             <div className="p-4 space-y-3 pb-24">
                                 {actions.map((act) => {
                                     const canAfford = ap >= act.apCost;
+                                    // Visual distinction for special actions
+                                    const isRichAction = act.id.includes('rich');
+                                    const isAdAction = act.id === 'take_ad';
+                                    
+                                    let btnClass = 'bg-white border-gray-300 hover:border-[#990000] hover:shadow-md active:bg-gray-50';
+                                    if (!canAfford) btnClass = 'bg-gray-100 border-gray-200 opacity-60 cursor-not-allowed';
+                                    else if (isRichAction) btnClass = 'bg-gradient-to-r from-yellow-50 to-white border-yellow-400 hover:shadow-md';
+                                    else if (isAdAction) btnClass = 'bg-gradient-to-r from-green-50 to-white border-green-400 hover:shadow-md text-green-900';
+
                                     return (
                                         <button
                                             key={act.id}
@@ -787,27 +827,20 @@
                                             onClick={() => onActionSelect(act)}
                                             className={`
                                                 w-full text-left p-3 border rounded-md transition-all group relative overflow-hidden
-                                                ${canAfford 
-                                                    ? 'bg-white border-gray-300 hover:border-[#990000] hover:shadow-md active:bg-gray-50' 
-                                                    : 'bg-gray-100 border-gray-200 opacity-60 cursor-not-allowed'}
+                                                ${btnClass}
                                             `}
                                         >
                                             <div className="flex justify-between items-center mb-1 relative z-10">
                                                 <span className={`font-black font-serif text-lg ${canAfford ? 'text-gray-800 group-hover:text-[#990000]' : 'text-gray-400'}`}>
-                                                    {act.label}
+                                                    {(isRichAction || isAdAction) && '✨ '}{act.label}
                                                 </span>
-                                                <span className="text-xs bg-black text-white px-1.5 py-0.5 font-bold">
-                                                    AP -{act.apCost}
-                                                </span>
+                                            </div>
+                                            <div className={`text-xs font-bold mb-1 opacity-80 ${isRichAction ? 'text-yellow-700' : isAdAction ? 'text-green-700' : 'text-gray-500'}`}>
+                                                {getActionStats(act, activeCategory)}
                                             </div>
                                             <p className="text-xs text-gray-500 italic relative z-10 pr-8">
                                                 {act.intent}
                                             </p>
-                                            {act.baseHeat && act.baseHeat > 0 && (
-                                                <span className="absolute bottom-2 right-2 text-[10px] font-bold text-[#990000] opacity-50">
-                                                    🔥 HOT
-                                                </span>
-                                            )}
                                         </button>
                                     );
                                 })}
@@ -932,7 +965,7 @@
                 <div className="flex flex-col h-screen items-center justify-center bg-[#F0F0F0] p-6 space-y-8 animate-fadeIn w-full">
                     <div className="text-center">
                         <h1 className="text-5xl font-black italic text-[#990000] mb-2 tracking-tighter">同人女<br/>模拟器</h1>
-                        <p className="text-gray-400 text-xs italic border-t border-gray-300 pt-2 tracking-widest">FANGIRL SIMULATOR REFACTORED</p>
+                        <p className="text-gray-400 text-xs italic border-t border-gray-300 pt-2 tracking-widest">FANGIRL SIMULATOR v2.0</p>
                     </div>
                     
                     <input 
@@ -960,12 +993,22 @@
             );
         };
 
-        // NEW: Detailed Settlement Screen
         const SettlementScreen = ({ state, onRestart }) => {
-            const endingTitle = state.san <= 0 ? "BE: 赛博疯子" : "BE: 进厂打工";
-            const endingDesc = state.san <= 0 
-                ? "你San值归零，发疯退网了。从此江湖上只留下了你的传说（和一堆坑）。" 
-                : "你破产了，被迫回归三次元打工。同人梦碎，现实真苦。";
+            let endingTitle = "BE: 进厂打工";
+            let endingDesc = "你破产了，被迫回归三次元打工。同人梦碎，现实真苦。";
+
+            if (state.isRetired) {
+                // Module A: Good Ending
+                endingTitle = "HE: 光荣退圈";
+                endingDesc = "你带着一身荣耀和传说，离开了这个是非之地。江湖虽远，但你的作品依然流传。";
+            } else if (state.san <= 0) {
+                endingTitle = "BE: 赛博疯子";
+                endingDesc = "你San值归零，发疯退网了。从此江湖上只留下了你的传说（和一堆坑）。";
+            } else if (state.money < -5000) {
+                // Module C: Credit Ruin
+                endingTitle = "BE: 信用破产";
+                endingDesc = "因虚假宣传背负巨债，被列入失信名单。你的同人女生涯以法制节目的方式结束了。";
+            }
 
             return (
                 <div className="fixed inset-0 bg-[#333] z-50 flex flex-col items-center justify-center p-6 text-white text-center animate-fadeIn overflow-y-auto">
@@ -1033,7 +1076,7 @@
         const App = () => {
             const [view, setView] = useState('start');
             const [activeMenu, setActiveMenu] = useState(null);
-            const [activeEvent, setActiveEvent] = useState(null); // NEW: State for current event modal
+            const [activeEvent, setActiveEvent] = useState(null);
             const [showAchievements, setShowAchievements] = useState(false);
             const [showSettings, setShowSettings] = useState(false);
             const [logs, setLogs] = useState([]);
@@ -1043,10 +1086,8 @@
                 weeks: 1, san: 100, maxSan: 100, money: 5000, heat: 0, fans: 0, 
                 ap: 5, maxAp: 5, moe: 0, toxic: 0, worksCount: 0,
                 maxSingleHeat: 0, consecutiveNoProduce: 0, consecutiveLow: 0, hasRevived: false,
-                isGameOver: false, unlockedAchievements: [], forceHighNext: false,
-                // New state fields
-                shadowBanWeeks: 0,
-                scandalActive: false
+                isGameOver: false, isRetired: false, unlockedAchievements: [], forceHighNext: false,
+                shadowBanWeeks: 0, scandalActive: false
             });
 
             const checkAchievements = useCallback((currentState) => {
@@ -1108,7 +1149,7 @@
                     ap: 5, maxAp: 5,
                     moe: 0, toxic: 0, worksCount: 0,
                     maxSingleHeat: 0, consecutiveNoProduce: 0, consecutiveLow: 0, hasRevived: false,
-                    isGameOver: false, unlockedAchievements: [], forceHighNext: false,
+                    isGameOver: false, isRetired: false, unlockedAchievements: [], forceHighNext: false,
                     shadowBanWeeks: 0, scandalActive: false
                 });
                 setLogs([]);
@@ -1118,7 +1159,12 @@
                 setView('game');
             };
 
-            // NEW: Apply Event Logic when confirmed
+            const handleRetire = () => {
+                if (window.confirm('确定要光荣退圈吗？这将触发完美结局 (HE)。')) {
+                    setState(prev => ({ ...prev, isGameOver: true, isRetired: true }));
+                }
+            };
+
             const handleEventConfirm = () => {
                 if (!activeEvent) return;
                 
@@ -1134,9 +1180,7 @@
                     if (logic.apZero) next.ap = 0;
                     if (logic.buff === 'shadow_ban') next.shadowBanWeeks = logic.buffDuration;
                     if (logic.triggerFlag === 'scandal_active') next.scandalActive = true;
-                    // Note: skipTurn logic is handled implicitly by consuming AP or user just not having actions
 
-                    // Check Game Over immediately after event
                     if (next.san <= 0) {
                         if (!next.hasRevived && next.unlockedAchievements.includes('ACH_12')) {
                             next.san = 20;
@@ -1146,7 +1190,7 @@
                             next.isGameOver = true;
                         }
                     }
-                    if (next.money < 0) next.isGameOver = true;
+                    if (next.money < -5000) next.isGameOver = true; // Module C: Credit Ruin
 
                     return next;
                 });
@@ -1156,54 +1200,64 @@
             };
 
             const handleNextWeek = () => {
-                // 1. Regular Update
                 setState(prev => {
                     let nextState = { ...prev };
                     
-                    // Salary
                     const isPayday = nextState.weeks % 4 === 0;
                     const salary = 5000;
-                    const livingCost = 400;
+                    
+                    // Module A: Living Cost Formula
+                    // Base 500 + (Heat * 0.005)
+                    const baseCost = 500;
+                    const heatCost = Math.floor(nextState.heat * 0.005);
+                    const livingCost = baseCost + heatCost;
+
                     let income = isPayday ? salary : 0;
                     
                     nextState.money = nextState.money + income - livingCost;
                     nextState.weeks += 1;
                     
-                    // Buffs/Debuffs
                     const maxApBuff = prev.unlockedAchievements.includes('ACH_07') ? 1 : 0;
                     nextState.ap = prev.maxAp + maxApBuff;
                     nextState.consecutiveNoProduce += 1;
                     if (nextState.shadowBanWeeks > 0) nextState.shadowBanWeeks -= 1;
 
-                    // Logs
                     addLog(`--- 第 ${nextState.weeks} 周 ---`, 'system');
                     if (isPayday) addLog(`💸 发工资了！+${salary}`, 'success');
-                    addLog(`支付生活费 ${livingCost}。`, 'system');
+                    
+                    if (heatCost > 0) {
+                        addLog(`支付生活费 ${livingCost} (基础${baseCost} + 社交开销${heatCost})。`, 'system');
+                    } else {
+                        addLog(`支付生活费 ${livingCost}。`, 'system');
+                    }
                     
                     if (nextState.scandalActive) {
-                        // Scandal follow-up chance
                         if (Math.random() < 0.3) {
                             addLog(`☠️ 塌房余波：你被极端粉冲了，SAN -10`, 'danger');
                             nextState.san -= 10;
                         }
                     }
 
-                    // Check Game Over conditions from money
-                    if (nextState.money < 0) nextState.isGameOver = true;
+                    // Module C: Credit Ruin Check
+                    if (nextState.money < -5000) {
+                        nextState.isGameOver = true;
+                        addLog('🚫 信用破产！你的债务已超过上限，被列入失信名单。', 'danger');
+                    } 
+                    // Manual retirement means we don't trigger HE automatically here.
+                    // BE still auto-triggers.
+                    else if (nextState.san <= 0 && !nextState.hasRevived) {
+                         nextState.isGameOver = true;
+                    }
 
                     return nextState;
                 });
                 
                 setActiveMenu(null);
 
-                // 2. Trigger Event Check
-                // Needs to access latest state, so we use a timeout or assume pre-event state is close enough for threshold
-                // We'll calculate threshold based on current state (before update) for simplicity
                 const threshold = state.san < 20 ? 0.4 : 0.2;
-                
                 if (Math.random() < threshold) {
                     const evt = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
-                    setTimeout(() => setActiveEvent(evt), 100); // Small delay for visual pacing
+                    setTimeout(() => setActiveEvent(evt), 100); 
                 }
             };
 
@@ -1221,6 +1275,12 @@
 
                 if (state.ap < cost) return;
 
+                // Module C: Ad System Handling
+                if (act.id === 'take_ad') {
+                    // Cost is usually 0 AP or 1 AP? Assuming 1 AP for consistency logic
+                    // Logic is handled below in generic flow but special overrides here
+                }
+
                 const roll = Math.random();
                 let luck = 'normal';
                 
@@ -1237,11 +1297,13 @@
                 else if (activeMenu === 'SOCIAL') flavorCategory = 'SOCIAL';
                 else if (activeMenu === 'LIFE') flavorCategory = 'LIFE';
 
-                const flavorData = FLAVOR_TEXT[flavorCategory]?.[act.id];
                 let logText = act.intent;
-                if (flavorData) {
-                    const texts = flavorData[luck];
-                    logText = texts[Math.floor(Math.random() * texts.length)];
+                if (!act.id.includes('rich') && !act.id.includes('take_ad')) {
+                     const flavorData = FLAVOR_TEXT[flavorCategory]?.[act.id];
+                     if (flavorData) {
+                        const texts = flavorData[luck];
+                        logText = texts[Math.floor(Math.random() * texts.length)];
+                     }
                 }
 
                 let sanDelta = act.baseSanChange;
@@ -1249,19 +1311,55 @@
                 if (moneyDelta < 0) moneyDelta = -moneyCost;
                 
                 let heatGain = 0;
-                if (activeMenu === 'PRODUCE') {
-                    // Check Shadow Ban
+
+                // SPECIAL LOGIC: AD SYSTEM (Module C)
+                if (act.id === 'take_ad') {
+                    // Pricing: 3000 * (1 + toxic * 0.2)
+                    // Note: 'toxic' tracks usage of Social Lv3 which is roughly "Battle/Rights"
+                    // Since Lv3 adds +2 Toxic, Toxic/2 is approx number of uses.
+                    const rightsCount = Math.floor(state.toxic / 2); 
+                    const basePrice = Math.floor(3000 * (1 + rightsCount * 0.2));
+
+                    if (luck === 'high') { // 20%
+                         moneyDelta = Math.floor(basePrice * 1.5);
+                         sanDelta = -5;
+                         logText = `💰 接到了大厂的优质推广！金主爸爸很满意，打钱超快。(收入 ${moneyDelta})`;
+                    } else if (luck === 'low') { // 20%
+                         moneyDelta = -Math.floor(basePrice * 2); // Penalty
+                         heatGain = -Math.floor(state.heat * 0.2); // Heat crash
+                         sanDelta = -30;
+                         logText = `💣 救命！接到了暴雷产品（三无微商/虚假宣传），被粉丝挂了！赔偿违约金并掉粉严重。`;
+                    } else { // 60%
+                         moneyDelta = basePrice;
+                         sanDelta = -15;
+                         logText = `😐 接了个电动牙刷/洗地机的广子。粉丝表示理解但还是有点嫌弃。(收入 ${moneyDelta})`;
+                    }
+                }
+                // LOGIC: Rich Social
+                else if (act.id === 'lv2_rich') {
+                    heatGain = 500;
+                } 
+                // LOGIC: Produce
+                else if (activeMenu === 'PRODUCE') {
                     if (state.shadowBanWeeks > 0) {
                         heatGain = 0;
                         logText += " (但是被限流了，热度 +0)";
                     } else {
-                        // CRITICAL: RETAINED HYPE ALGORITHM
                         let base = 50;
                         if (act.id === 'lv2') base = 200;
                         if (act.id === 'lv3') base = 800;
 
                         const variance = 0.8 + Math.random() * 0.4;
-                        const fanMult = 1 + (state.heat / 5000);
+                        
+                        // Module B: Heat Cap Formula
+                        let fanMult = 1;
+                        if (state.heat < 50000) {
+                            fanMult = 1 + (state.heat / 5000);
+                        } else {
+                            // Logarithmic decay after 50k
+                            // 11 + log10(heat - 40000) * 8
+                            fanMult = 11 + Math.log10(state.heat - 40000) * 8;
+                        }
                         
                         let crit = 1.0;
                         if (luck === 'high') crit = 1.5;
@@ -1269,15 +1367,9 @@
                         
                         heatGain = Math.floor((base * variance) * fanMult * crit);
 
-                        if (state.unlockedAchievements.includes('ACH_01') && state.heat < 1000) {
-                            heatGain = Math.floor(heatGain * 1.1);
-                        }
-                        if (state.unlockedAchievements.includes('ACH_03')) {
-                            heatGain = Math.floor(heatGain * 1.5);
-                        }
-                        if (state.unlockedAchievements.includes('ACH_04')) {
-                            heatGain = heatGain * 2;
-                        }
+                        if (state.unlockedAchievements.includes('ACH_01') && state.heat < 1000) heatGain = Math.floor(heatGain * 1.1);
+                        if (state.unlockedAchievements.includes('ACH_03')) heatGain = Math.floor(heatGain * 1.5);
+                        if (state.unlockedAchievements.includes('ACH_04')) heatGain = heatGain * 2;
                     }
                 } else {
                     heatGain = act.baseHeat || 0;
@@ -1286,6 +1378,7 @@
                     }
                 }
 
+                // Global Buffs
                 if (state.unlockedAchievements.includes('ACH_05') && activeMenu === 'LIFE' && act.id === 'lv2') {
                     moneyDelta = Math.floor(moneyDelta * 1.2);
                 }
@@ -1305,8 +1398,11 @@
 
                     newState.san = Math.min(currentMaxSan, Math.max(0, prev.san + sanDelta));
                     newState.money += moneyDelta;
-                    newState.heat += heatGain;
-                    newState.fans += Math.floor(heatGain / 10);
+                    
+                    // Heat update (allow negative from Ad scandal)
+                    newState.heat = Math.max(0, newState.heat + heatGain); 
+                    // Fans follow heat roughly
+                    newState.fans = Math.max(0, newState.fans + Math.floor(heatGain / 10));
                     
                     if (activeMenu === 'PRODUCE') {
                         newState.worksCount += 1;
@@ -1321,8 +1417,13 @@
                         if (act.id === 'lv1') newState.moe += 2;
                         if (act.id === 'lv3') newState.toxic += 2;
                     }
-
-                    newState.forceHighNext = false; 
+                    
+                    if (act.id === 'lv3_rich') {
+                        newState.forceHighNext = true;
+                        addLog('✨ 奢华旅游让你灵感爆棚！下一次产出必定 High！', 'success');
+                    } else {
+                        newState.forceHighNext = false; 
+                    }
 
                     if (newState.san <= 0) {
                         if (!newState.hasRevived && newState.unlockedAchievements.includes('ACH_12')) {
@@ -1333,7 +1434,8 @@
                             newState.isGameOver = true;
                         }
                     }
-                    if (newState.money < 0) {
+                    // Module C: Credit Ruin Check
+                    if (newState.money < -5000) {
                         newState.isGameOver = true;
                     }
 
@@ -1351,15 +1453,14 @@
                 const type = luck === 'high' ? 'success' : luck === 'low' ? 'danger' : 'action';
                 addLog(logText, type);
                 
-                if (heatGain > 0) {
-                    let icon = '';
+                if (heatGain !== 0) {
+                    let icon = heatGain > 0 ? '🔥 ' : '📉 ';
                     if (heatGain > 10000) icon = '👑 ';
-                    else if (heatGain > 2000) icon = '🔥 ';
                     
-                    addLog(`${icon}热度 +${heatGain.toLocaleString()} | 粉丝 +${Math.floor(heatGain/10)}`, heatGain > 2000 ? 'success' : 'event');
+                    addLog(`${icon}热度 ${heatGain > 0 ? '+' : ''}${heatGain.toLocaleString()}`, heatGain > 0 ? (heatGain > 2000 ? 'success' : 'event') : 'danger');
                 }
                 
-                if (moneyDelta !== 0) addLog(`💰 金钱 ${moneyDelta > 0 ? '+' : ''}${moneyDelta}`, 'event');
+                if (moneyDelta !== 0) addLog(`💰 金钱 ${moneyDelta > 0 ? '+' : ''}${moneyDelta}`, moneyDelta < 0 ? 'danger' : 'event');
                 if (sanDelta !== 0) addLog(`❤️ SAN ${sanDelta > 0 ? '+' : ''}${sanDelta}`, sanDelta < 0 ? 'danger' : 'event');
                 
                 setActiveMenu(null);
@@ -1367,8 +1468,50 @@
 
             const getActiveActions = () => {
                 if (!activeMenu) return [];
-                if (activeMenu === 'PRODUCE') return ACTIONS[state.job];
-                return ACTIONS[activeMenu];
+                
+                let currentActions = [];
+                if (activeMenu === 'PRODUCE') currentActions = ACTIONS[state.job];
+                else currentActions = ACTIONS[activeMenu];
+                
+                currentActions = [...currentActions];
+
+                if (state.money > 3000) {
+                    if (activeMenu === 'SOCIAL') {
+                         currentActions[1] = { 
+                             id: 'lv2_rich', 
+                             label: '🧧 钞能力/抽奖', 
+                             apCost: 1, 
+                             baseSanChange: 30, 
+                             baseMoneyChange: -2000, 
+                             baseHeat: 0, 
+                             intent: '你发了的大额红包/抽奖，全网都在转你的安利！' 
+                         };
+                    }
+                    if (activeMenu === 'LIFE') {
+                        currentActions[2] = {
+                            id: 'lv3_rich',
+                            label: '✈️ 奢华旅游',
+                            apCost: 1,
+                            baseSanChange: 50,
+                            baseMoneyChange: -3000,
+                            intent: '头等舱的快乐，灵感源源不断。'
+                        };
+                    }
+                }
+
+                // Module C: Inject Ad Action into LIFE menu
+                if (activeMenu === 'LIFE' && state.heat > 30000) {
+                    currentActions.push({
+                        id: 'take_ad',
+                        label: '💰 接广子/恰饭',
+                        apCost: 1,
+                        baseSanChange: 0, // Calculated dynamically
+                        baseMoneyChange: 0, // Calculated dynamically
+                        intent: '哪怕被骂，我也要赚钱！'
+                    });
+                }
+
+                return currentActions;
             };
 
             if (view === 'start') return <StartScreen onStart={startGame} />;
@@ -1379,6 +1522,7 @@
                         state={state} 
                         showAchievements={() => setShowAchievements(true)}
                         onOpenSettings={() => setShowSettings(true)}
+                        onRetire={handleRetire}
                     />
 
                     <GameLog logs={logs} />
@@ -1409,7 +1553,6 @@
                         />
                     )}
 
-                    {/* NEW: Event Modal Layer */}
                     {activeEvent && (
                         <EventModal 
                             event={activeEvent}
@@ -1417,7 +1560,6 @@
                         />
                     )}
 
-                    {/* UPDATED: Settlement Screen */}
                     {state.isGameOver && (
                         <SettlementScreen state={state} onRestart={() => setView('start')} />
                     )}
