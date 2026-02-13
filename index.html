@@ -107,7 +107,7 @@
         const { useState, useEffect, useCallback, useRef } = React;
 
         // ==========================================
-        // DATA SECTION (ASSETS PRESERVED)
+        // DATA SECTION (ASSETS PRESERVED + UPDATED CORPUS)
         // ==========================================
 
         const JOB_MAP = { 
@@ -142,6 +142,7 @@
         ];
 
         const RANDOM_EVENTS = [
+            // Original Negative Events
             {
                 id: 'EVT_SERVER_DOWN',
                 name: '快乐老家炸了',
@@ -176,6 +177,42 @@
                 description: '不知道触发了什么关键词，你的账号被大眼仔/平台限流了。发出去的图只有你自己能看见，仿佛在这个互联网上裸奔。',
                 effectDesc: 'San -10 | 热度增长归零 (持续2周)',
                 logic: { san: -10, buff: 'shadow_ban', buffDuration: 2 }
+            },
+            // New Positive Events
+            {
+                id: 'EVT_POS_01',
+                name: '虚惊一场',
+                description: '以为文档没保存电脑死机，结果自动恢复了！',
+                effectDesc: 'San +20',
+                logic: { san: 20 }
+            },
+            {
+                id: 'EVT_POS_02',
+                name: '意外横财',
+                description: '随手转发抽奖居然中了！',
+                effectDesc: 'Money +1000 | San +10',
+                logic: { money: 1000, san: 10 }
+            },
+            {
+                id: 'EVT_POS_03',
+                name: '官方喂饭',
+                description: '官方突然发高清物料，按头磕CP！',
+                effectDesc: 'San +30 | Toxic -10',
+                logic: { san: 30, toxic: -10 }
+            },
+            {
+                id: 'EVT_POS_04',
+                name: '神仙下凡',
+                description: '退圈的远古大神突然转发了你的作品。',
+                effectDesc: 'Heat +3000',
+                logic: { heat: 3000 }
+            },
+            {
+                id: 'EVT_POS_05',
+                name: '法定假日',
+                description: '老板出差了，本周拥有完全自由时间。',
+                effectDesc: '本周 AP +1',
+                logic: { ap: 1 }
             }
         ];
 
@@ -481,16 +518,66 @@
         };
 
         const FANDOMS = [
-            { name: '欧美冷门剧', mode: 'General' }, 
-            { name: '内娱选秀', mode: 'RPS' }, 
-            { name: '二次元手游', mode: 'ACG' }
+            { name: "欧美冷门剧", mode: "General" },
+            { name: "环大陆耽改剧", mode: "General" },
+            { name: "大热爆剧", mode: "General" },
+            { name: "内娱选秀", mode: "RPS" },
+            { name: "国民级二次元手游", mode: "ACG" },
+            { name: "全员恶人韩娱圈", mode: "RPS" },
+            { name: "主队落寞球队", mode: "RPS" },
+            { name: "遍地厕所韩娱圈", mode: "RPS" },
+            { name: "男味满满电竞圈", mode: "RPS" },
+            { name: "满地破碎玻璃心竞技体育圈", mode: "RPS" },
+            { name: "养老型冷门番", mode: "ACG" },
+            { name: "塌房重灾区RPS", mode: "RPS" },
+            { name: "全员恶人权谋剧", mode: "General" },
+            { name: "皮套人Vtuber", mode: "ACG" },
+            { name: "2.5次元特摄", mode: "ACG" },
+            { name: "英美摇滚乐队", mode: "RPS" },
+            { name: "相声喜剧圈", mode: "RPS" },
+            { name: "大势韩漫", mode: "ACG" },
+            { name: "中式恐怖民俗", mode: "General" },
+            { name: "大女主宫斗剧", mode: "General" },
+            { name: "甚至是虚拟主播", mode: "ACG" },
+            { name: "糊到地心的男团", mode: "RPS" },
+            { name: "欧美RPS", mode: "RPS" },
+            { name: "泰腐营业剧", mode: "General" },
+            { name: "迪士尼在逃公主圈", mode: "General" },
+            { name: "甚至只有三个人的北极圈", mode: "General" },
+            { name: "除了我全是Bot的赛博鬼服", mode: "General" }
         ];
-        const TROPES = ['烂人真心', '破镜重圆', '青梅竹马', '相爱相杀', '水仙', '拉郎配'];
+
+        const TROPES = [
+            "烂人真心", "恨海情天", "破镜重圆", "青梅竹马", "相爱相杀", "拉郎配", "水仙", 
+            "老少恋", "追妻火葬场", "哨向精神结合", "ABO带球跑", "替身白月光", "强制爱小黑屋", 
+            "先婚后爱", "无限流大逃杀", "养成年下攻", "跨物种人外", "双向暗恋", "宿敌变情人", 
+            "救赎文学", "花吐症", "甚至还是BE", "娱乐圈包养文学", "破产大佬", "体型差/肤色差"
+        ];
+
         const TALENTS = { 
-            '文手': ['坑品极差的', '文笔惊艳的'], 
-            '画手': ['人体描边大师', '神仙光影的'], 
-            '剪辑': ['特效大神的', '卡点狂魔'], 
-            '路人': ['很有钱的', '看文必评论的'] 
+            '文手': [
+                "日更三千的", "坑品极差的", "只会写清水的", "文笔惊艳的", "只会写PWP的", 
+                "喜欢无脑捡手机论坛体的", "卡文卡在H点的", "只会写刀子的", "如果不看文笔其实剧情还行的", 
+                "红锁文学一级学者", "坑品极好但全是短篇的", "这辈子没写过HE的", "逻辑死早但梗很香的", 
+                "存稿箱有三十万字的", "写文全靠做梦的", "标点符号都在开车的", "文案诈骗犯"
+            ], 
+            '画手': [
+                "人体描边大师", "神仙光影的", "只会画大头的", "手速极快的", "画风清奇的", 
+                "美院出身的专业大佬", "擅长厚涂", "只会画Q版的", "色感稀碎的", "背景全是素材库的", 
+                "除了脸其他都不能看的", "人体结构像麻花的", "肝脏已经硬化的", "万年不发货的", 
+                "画风突变的", "草稿流大师", "甚至不会画手的", "图层合并狂魔"
+            ], 
+            '剪辑': [
+                "踩点/渲染/软件崩溃/卡点狂魔", "只会套模板的", "特效大神的", "肝到秃头的", 
+                "BGM万年用那一首的", "调色调成阴间滤镜的", "台词拼凑全靠脑补的", "只要一渲染就死机的", 
+                "转场生硬像PPT的", "踩点强迫症晚期的", "素材多到硬盘爆的", "剪辑软件崩溃受害者", "手书/大触的"
+            ], 
+            '路人': [
+                "很有钱的", "看文必评论的", "只会啊啊啊的", "甚至不买谷的", "毒舌乐子人", 
+                "如果不买谷就会死的", "甚至为了CP学外语的", "拥有800个小号切号控评的", 
+                "只看不点赞的", "虽然没钱但爱得深沉的", "只要同框即发糖的", "见人就安利的", 
+                "在闲鱼高价收物的", "甚至想给正主打钱的", "住在微博房顶的"
+            ] 
         };
 
         // ==========================================
@@ -665,7 +752,6 @@
         };
 
         const StatusHeader = ({ state, showAchievements, onOpenSettings, onRetire }) => {
-            // Module A: Check for Retirement Eligibility (God or Rich)
             const canRetire = state.unlockedAchievements.includes('ACH_04') || state.unlockedAchievements.includes('ACH_06');
 
             return (
@@ -994,20 +1080,28 @@
         };
 
         const SettlementScreen = ({ state, onRestart }) => {
-            let endingTitle = "BE: 进厂打工";
-            let endingDesc = "你破产了，被迫回归三次元打工。同人梦碎，现实真苦。";
+            let endingTitle = "";
+            let endingDesc = "";
 
-            if (state.isRetired) {
-                // Module A: Good Ending
-                endingTitle = "HE: 光荣退圈";
-                endingDesc = "你带着一身荣耀和传说，离开了这个是非之地。江湖虽远，但你的作品依然流传。";
-            } else if (state.san <= 0) {
-                endingTitle = "BE: 赛博疯子";
-                endingDesc = "你San值归零，发疯退网了。从此江湖上只留下了你的传说（和一堆坑）。";
-            } else if (state.money < -5000) {
-                // Module C: Credit Ruin
-                endingTitle = "BE: 信用破产";
-                endingDesc = "因虚假宣传背负巨债，被列入失信名单。你的同人女生涯以法制节目的方式结束了。";
+            if (state.endingType === 'RETRIED_HE') {
+                 endingTitle = "HE: 光荣退圈";
+                 endingDesc = "你带着一身荣耀和传说，离开了这个是非之地。江湖虽远，但你的作品依然流传。";
+            } else if (state.endingType === 'MONEY_HE') {
+                 endingTitle = "HE: 钞能力者";
+                 endingDesc = "你太有钱了。官方不出周边你就自己做，你买下了漫展最大的摊位。完美结局。";
+            } else if (state.endingType === 'HEAT_HE') {
+                 endingTitle = "HE: 镇圈神仙";
+                 endingDesc = "你的热度已经不可阻挡。提到这对CP，大家想到的第一个人就是你。传说结局。";
+            } else if (state.endingType === 'SAN_BE') {
+                 endingTitle = "BE: 赛博疯子";
+                 endingDesc = "你的精神防线崩塌了。你开始在互联网上无差别攻击，最终被封号。游戏结束。";
+            } else if (state.endingType === 'MONEY_BE') {
+                 endingTitle = "BE: 进厂打工";
+                 endingDesc = "信用卡账单寄到了。为了还债，你卖掉了所有谷子，找了个班上。游戏结束。";
+            } else {
+                 // Fallback
+                 endingTitle = "GAME OVER";
+                 endingDesc = "游戏结束。";
             }
 
             return (
@@ -1086,9 +1180,51 @@
                 weeks: 1, san: 100, maxSan: 100, money: 5000, heat: 0, fans: 0, 
                 ap: 5, maxAp: 5, moe: 0, toxic: 0, worksCount: 0,
                 maxSingleHeat: 0, consecutiveNoProduce: 0, consecutiveLow: 0, hasRevived: false,
-                isGameOver: false, isRetired: false, unlockedAchievements: [], forceHighNext: false,
+                isGameOver: false, endingType: null, unlockedAchievements: [], forceHighNext: false,
                 shadowBanWeeks: 0, scandalActive: false
             });
+
+            // Helper to check for Game Over conditions
+            const checkGameOver = useCallback((currentState) => {
+                let newState = { ...currentState };
+                
+                // 1. BE: 赛博疯子 (San <= 0)
+                if (newState.san <= 0) {
+                     if (!newState.hasRevived && newState.unlockedAchievements.includes('ACH_12')) {
+                        newState.san = 20; 
+                        newState.hasRevived = true;
+                        addLog('💔 SAN值归零... 但是！【强心脏】发动！垂死病中惊坐起！', 'success');
+                        return newState;
+                     } else {
+                        newState.isGameOver = true;
+                        newState.endingType = 'SAN_BE';
+                        return newState;
+                     }
+                }
+                
+                // 2. BE: 进厂打工 (Money < 0)
+                if (newState.money < 0) {
+                    newState.isGameOver = true;
+                    newState.endingType = 'MONEY_BE';
+                    return newState;
+                }
+
+                // 3. HE: 钞能力者 (Money > 50000)
+                if (newState.money > 50000) {
+                    newState.isGameOver = true;
+                    newState.endingType = 'MONEY_HE';
+                    return newState;
+                }
+
+                // 4. HE: 镇圈神仙 (Heat > 100000)
+                if (newState.heat > 100000) {
+                    newState.isGameOver = true;
+                    newState.endingType = 'HEAT_HE';
+                    return newState;
+                }
+
+                return newState;
+            }, []);
 
             const checkAchievements = useCallback((currentState) => {
                 const newUnlocked = [];
@@ -1149,7 +1285,7 @@
                     ap: 5, maxAp: 5,
                     moe: 0, toxic: 0, worksCount: 0,
                     maxSingleHeat: 0, consecutiveNoProduce: 0, consecutiveLow: 0, hasRevived: false,
-                    isGameOver: false, isRetired: false, unlockedAchievements: [], forceHighNext: false,
+                    isGameOver: false, endingType: null, unlockedAchievements: [], forceHighNext: false,
                     shadowBanWeeks: 0, scandalActive: false
                 });
                 setLogs([]);
@@ -1161,7 +1297,7 @@
 
             const handleRetire = () => {
                 if (window.confirm('确定要光荣退圈吗？这将触发完美结局 (HE)。')) {
-                    setState(prev => ({ ...prev, isGameOver: true, isRetired: true }));
+                    setState(prev => ({ ...prev, isGameOver: true, endingType: 'RETRIED_HE' }));
                 }
             };
 
@@ -1176,23 +1312,15 @@
                     if (logic.money) next.money += logic.money;
                     if (logic.heat) next.heat += logic.heat;
                     if (logic.toxic) next.toxic += logic.toxic;
+                    if (logic.ap) next.ap += logic.ap; // New logic for Positive Event 5
                     
                     if (logic.apZero) next.ap = 0;
                     if (logic.buff === 'shadow_ban') next.shadowBanWeeks = logic.buffDuration;
                     if (logic.triggerFlag === 'scandal_active') next.scandalActive = true;
+                    if (logic.skipTurn) next.ap = 0;
 
-                    if (next.san <= 0) {
-                        if (!next.hasRevived && next.unlockedAchievements.includes('ACH_12')) {
-                            next.san = 20;
-                            next.hasRevived = true;
-                            addLog('💔 SAN值归零... 但是！【强心脏】发动！垂死病中惊坐起！', 'success');
-                        } else {
-                            next.isGameOver = true;
-                        }
-                    }
-                    if (next.money < -5000) next.isGameOver = true; // Module C: Credit Ruin
-
-                    return next;
+                    // Immediately check Game Over
+                    return checkGameOver(next);
                 });
 
                 addLog(`⚠️ <b>事件生效:</b> ${activeEvent.name}`, 'danger');
@@ -1205,9 +1333,6 @@
                     
                     const isPayday = nextState.weeks % 4 === 0;
                     const salary = 5000;
-                    
-                    // Module A: Living Cost Formula
-                    // Base 500 + (Heat * 0.005)
                     const baseCost = 500;
                     const heatCost = Math.floor(nextState.heat * 0.005);
                     const livingCost = baseCost + heatCost;
@@ -1238,18 +1363,8 @@
                         }
                     }
 
-                    // Module C: Credit Ruin Check
-                    if (nextState.money < -5000) {
-                        nextState.isGameOver = true;
-                        addLog('🚫 信用破产！你的债务已超过上限，被列入失信名单。', 'danger');
-                    } 
-                    // Manual retirement means we don't trigger HE automatically here.
-                    // BE still auto-triggers.
-                    else if (nextState.san <= 0 && !nextState.hasRevived) {
-                         nextState.isGameOver = true;
-                    }
-
-                    return nextState;
+                    nextState = checkAchievements(nextState);
+                    return checkGameOver(nextState);
                 });
                 
                 setActiveMenu(null);
@@ -1274,12 +1389,6 @@
                 }
 
                 if (state.ap < cost) return;
-
-                // Module C: Ad System Handling
-                if (act.id === 'take_ad') {
-                    // Cost is usually 0 AP or 1 AP? Assuming 1 AP for consistency logic
-                    // Logic is handled below in generic flow but special overrides here
-                }
 
                 const roll = Math.random();
                 let luck = 'normal';
@@ -1312,34 +1421,28 @@
                 
                 let heatGain = 0;
 
-                // SPECIAL LOGIC: AD SYSTEM (Module C)
                 if (act.id === 'take_ad') {
-                    // Pricing: 3000 * (1 + toxic * 0.2)
-                    // Note: 'toxic' tracks usage of Social Lv3 which is roughly "Battle/Rights"
-                    // Since Lv3 adds +2 Toxic, Toxic/2 is approx number of uses.
                     const rightsCount = Math.floor(state.toxic / 2); 
                     const basePrice = Math.floor(3000 * (1 + rightsCount * 0.2));
 
-                    if (luck === 'high') { // 20%
+                    if (luck === 'high') { 
                          moneyDelta = Math.floor(basePrice * 1.5);
                          sanDelta = -5;
                          logText = `💰 接到了大厂的优质推广！金主爸爸很满意，打钱超快。(收入 ${moneyDelta})`;
-                    } else if (luck === 'low') { // 20%
-                         moneyDelta = -Math.floor(basePrice * 2); // Penalty
-                         heatGain = -Math.floor(state.heat * 0.2); // Heat crash
+                    } else if (luck === 'low') {
+                         moneyDelta = -Math.floor(basePrice * 2); 
+                         heatGain = -Math.floor(state.heat * 0.2); 
                          sanDelta = -30;
                          logText = `💣 救命！接到了暴雷产品（三无微商/虚假宣传），被粉丝挂了！赔偿违约金并掉粉严重。`;
-                    } else { // 60%
+                    } else { 
                          moneyDelta = basePrice;
                          sanDelta = -15;
                          logText = `😐 接了个电动牙刷/洗地机的广子。粉丝表示理解但还是有点嫌弃。(收入 ${moneyDelta})`;
                     }
                 }
-                // LOGIC: Rich Social
                 else if (act.id === 'lv2_rich') {
                     heatGain = 500;
                 } 
-                // LOGIC: Produce
                 else if (activeMenu === 'PRODUCE') {
                     if (state.shadowBanWeeks > 0) {
                         heatGain = 0;
@@ -1351,13 +1454,10 @@
 
                         const variance = 0.8 + Math.random() * 0.4;
                         
-                        // Module B: Heat Cap Formula
                         let fanMult = 1;
                         if (state.heat < 50000) {
                             fanMult = 1 + (state.heat / 5000);
                         } else {
-                            // Logarithmic decay after 50k
-                            // 11 + log10(heat - 40000) * 8
                             fanMult = 11 + Math.log10(state.heat - 40000) * 8;
                         }
                         
@@ -1378,7 +1478,6 @@
                     }
                 }
 
-                // Global Buffs
                 if (state.unlockedAchievements.includes('ACH_05') && activeMenu === 'LIFE' && act.id === 'lv2') {
                     moneyDelta = Math.floor(moneyDelta * 1.2);
                 }
@@ -1398,10 +1497,7 @@
 
                     newState.san = Math.min(currentMaxSan, Math.max(0, prev.san + sanDelta));
                     newState.money += moneyDelta;
-                    
-                    // Heat update (allow negative from Ad scandal)
                     newState.heat = Math.max(0, newState.heat + heatGain); 
-                    // Fans follow heat roughly
                     newState.fans = Math.max(0, newState.fans + Math.floor(heatGain / 10));
                     
                     if (activeMenu === 'PRODUCE') {
@@ -1425,20 +1521,6 @@
                         newState.forceHighNext = false; 
                     }
 
-                    if (newState.san <= 0) {
-                        if (!newState.hasRevived && newState.unlockedAchievements.includes('ACH_12')) {
-                            newState.san = 20; 
-                            newState.hasRevived = true;
-                            addLog('💔 SAN值归零... 但是！【强心脏】发动！垂死病中惊坐起！', 'success');
-                        } else {
-                            newState.isGameOver = true;
-                        }
-                    }
-                    // Module C: Credit Ruin Check
-                    if (newState.money < -5000) {
-                        newState.isGameOver = true;
-                    }
-
                     newState = checkAchievements(newState);
                     
                     if (newState.consecutiveLow >= 3 && newState.unlockedAchievements.includes('ACH_13')) {
@@ -1447,7 +1529,7 @@
                         addLog('✨ 【非酋之王】触发：厄运到了极致就是幸运。下一次产出必定 High！', 'success');
                     }
 
-                    return newState;
+                    return checkGameOver(newState);
                 });
 
                 const type = luck === 'high' ? 'success' : luck === 'low' ? 'danger' : 'action';
@@ -1499,14 +1581,13 @@
                     }
                 }
 
-                // Module C: Inject Ad Action into LIFE menu
                 if (activeMenu === 'LIFE' && state.heat > 30000) {
                     currentActions.push({
                         id: 'take_ad',
                         label: '💰 接广子/恰饭',
                         apCost: 1,
-                        baseSanChange: 0, // Calculated dynamically
-                        baseMoneyChange: 0, // Calculated dynamically
+                        baseSanChange: 0, 
+                        baseMoneyChange: 0, 
                         intent: '哪怕被骂，我也要赚钱！'
                     });
                 }
